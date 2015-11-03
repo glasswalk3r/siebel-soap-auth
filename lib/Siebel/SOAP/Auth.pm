@@ -306,15 +306,59 @@ This is the list of those methods with a brief explanation:
 
 =item *
 
-get_token_key: getter for C<token_key> attribute.
+get_token_key: getter for the C<token_key> attribute.
 
 =item *
 
-get_header_ns: getter for C<header_ns> attribute.
+get_header_ns: getter for the C<header_ns> attribute.
 
 =item *
 
-set_header_ns: setter for C<header_ns> attribute.
+set_header_ns: setter for the C<header_ns> attribute.
+
+=item *
+
+get_user: getter for the C<user> attribute.
+
+=item *
+
+set_user: setter for the C<user> attribute.
+
+=item *
+
+get_pass: getter for the C<password> attribute.
+
+=item *
+
+set_pass: setter for the C<password> attribute.
+
+=item *
+
+get_token: getter for the C<token> attribute.
+
+=item *
+
+get_lookup_ns: getter for the C<lookup_ns> attribute.
+
+=item *
+
+get_remain_ttl: getter for the C<remain_ttl> attribute.
+
+=item *
+
+get_session_type: getter for the C<session_type> attribute.
+
+=item *
+
+get_session_timeout: getter for the C<session_timeout> attribute.
+
+=item *
+
+get_token_timeout: getter for the C<token_timeout> attribute.
+
+=item *
+
+get_token_max_age: getter for the C<token_max_age> attribute.
 
 =back
 
@@ -465,7 +509,7 @@ sub find_token {
 
 Verifies if an answer from the Siebel Server is a failure of not.
 
-Expects as parameter the answer and raises an exception.
+Expects as parameter the answer.
 
 If the fault returned by the server is related to a token expiration, a exception
 will be raised with the text "token expired".
@@ -475,7 +519,7 @@ provide a fallback routine (like resending your request). The instance of Siebel
 also resets the token status internally to allow reuse.
 
 For other errors, an exception will be created with exactly the same message available in the fault
-element of the SOAP envelope.
+element of the SOAP envelope. You should evaluate the error message and take appropriate measures.
 
 =cut
 
@@ -502,5 +546,48 @@ sub check_fault {
     }
 
 }
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<XML::Compile::WSDL11>
+
+=item *
+
+L<Log::Report>
+
+=item *
+
+L<Moo>
+
+=back
+
+=head1 AUTHOR
+
+Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 of Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+
+This file is part of Siebel-SOAP-Auth distribution.
+
+Siebel-SOAP-Auth is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Siebel-SOAP-Auth is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Term-YAP. If not, see <http://www.gnu.org/licenses/>.
+
+=cut
 
 1;
