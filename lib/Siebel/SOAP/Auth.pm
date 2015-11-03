@@ -10,6 +10,7 @@ use Encode qw(encode);
 use Scalar::Util qw(blessed);
 use Time::HiRes qw(time);
 use Log::Report 1.05 'siebel-soap-auth', syntax => 'SHORT';
+use Carp;
 
 =pod
 
@@ -302,67 +303,69 @@ Of course, read-only attributes have only getters.
 
 This is the list of those methods with a brief explanation:
 
-=over
+=head2 get_token_key
 
-=item *
+Getter for the C<token_key> attribute.
 
-get_token_key: getter for the C<token_key> attribute.
+=head2 get_header_ns
 
-=item *
+Getter for the C<header_ns> attribute.
 
-get_header_ns: getter for the C<header_ns> attribute.
+=head2 set_header_ns
 
-=item *
+Setter for the C<header_ns> attribute.
 
-set_header_ns: setter for the C<header_ns> attribute.
+=head2 get_user
 
-=item *
+Getter for the C<user> attribute.
 
-get_user: getter for the C<user> attribute.
+=head2 set_user
 
-=item *
+Setter for the C<user> attribute.
 
-set_user: setter for the C<user> attribute.
+=head2 get_pass
 
-=item *
+Getter for the C<password> attribute.
 
-get_pass: getter for the C<password> attribute.
+=head2 set_pass
 
-=item *
+Setter for the C<password> attribute.
 
-set_pass: setter for the C<password> attribute.
+=head2 get_token
 
-=item *
+Getter for the C<token> attribute.
 
-get_token: getter for the C<token> attribute.
+=head2 get_lookup_ns
 
-=item *
+Getter for the C<lookup_ns> attribute.
 
-get_lookup_ns: getter for the C<lookup_ns> attribute.
+=head2 get_remain_ttl
 
-=item *
+Getter for the C<remain_ttl> attribute.
 
-get_remain_ttl: getter for the C<remain_ttl> attribute.
+=head2 get_session_type
 
-=item *
+Getter for the C<session_type> attribute.
 
-get_session_type: getter for the C<session_type> attribute.
+=head2 get_session_timeout
 
-=item *
+Getter for the C<session_timeout> attribute.
 
-get_session_timeout: getter for the C<session_timeout> attribute.
+=head2 get_token_timeout
 
-=item *
+Getter for the C<token_timeout> attribute.
 
-get_token_timeout: getter for the C<token_timeout> attribute.
+=head2 get_token_max_age
 
-=item *
+Getter for the C<token_max_age> attribute.
 
-get_token_max_age: getter for the C<token_max_age> attribute.
+=head2 get_auth_fault
 
-=back
+Getter for the C<auth_fault> attribute.
 
-There are additional methods as well.
+=head2 get_last_fault
+
+Getter for the C<last_fault> attribute.
 
 =cut
 
@@ -389,7 +392,7 @@ sub add_auth_header {
     #my ($self, $request, $ua) = @_;
     my ( $self, $request ) = @_;
 
-    die "Expect as parameter a HTTP::Request instance"
+    croak "Expect as parameter a HTTP::Request instance"
       unless ( ( defined($request) )
         and ( defined( blessed($request) ) )
         and ( $request->isa('HTTP::Request') ) );
@@ -482,24 +485,26 @@ sub find_token {
 
     my ( $self, $answer ) = @_;
 
-    die "Expect as parameter a hash reference"
+    croak "Expect as parameter a hash reference"
       unless ( ( defined($answer) ) and ( ref($answer) eq 'HASH' ) );
 
     my $key = $self->get_token_key();
 
     if ( exists( $answer->{$key} ) ) {
 
-        die "Expect as parameter a XML::LibXML::Element instance"
+        croak "Expect as parameter a XML::LibXML::Element instance"
           unless ( ( defined( $answer->{$key} ) )
             and ( defined( blessed( $answer->{$key} ) ) )
             and ( $answer->{$key}->isa('XML::LibXML::Element') ) );
+
         $self->_set_token( $answer->{$key}->textContent );
         $self->_set_token_birth( time() ) unless ( $self->_has_token_birth );
+        return 1;
 
     }
     else {
 
-        die "could not find the key $key in the answer received as parameter";
+        croak "could not find the key $key in the answer received as parameter";
 
     }
 
@@ -534,12 +539,12 @@ sub check_fault {
         trace 'cleaned up token and token_birth attributes';
         if ( $answer->{Fault}->{faultstring} =~ $self->get_auth_fault() ) {
 
-            die 'token expired';
+            croak 'token expired';
 
         }
         else {
 
-            die $answer->{Fault}->{faultstring};
+            croak $answer->{Fault}->{faultstring};
 
         }
 
