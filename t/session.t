@@ -1,9 +1,9 @@
 use warnings;
 use strict;
-use XML::Compile::WSDL11;
-use XML::Compile::SOAP11;
-use XML::Compile::Transport::SOAPHTTP;
-use XML::LibXML;
+use XML::Compile::WSDL11 3.04;
+use XML::Compile::SOAP11 3.12;
+use XML::Compile::Transport::SOAPHTTP 3.12;
+use XML::LibXML 2.0122;
 use Test::More tests => 42;
 use Log::Report mode => 'NORMAL';
 use Siebel::SOAP::Auth;
