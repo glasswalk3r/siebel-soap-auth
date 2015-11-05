@@ -3,14 +3,13 @@ use strict;
 use XML::Compile::WSDL11 3.04;
 use XML::Compile::SOAP11 3.12;
 use XML::Compile::Transport::SOAPHTTP 3.12;
-use XML::LibXML 2.0122;
-use Test::More tests => 42;
+use Test::More tests => 43;
+use Test::Exception 0.40;
 use Log::Report mode => 'NORMAL';
 use Siebel::SOAP::Auth;
 use File::Spec;
 use Digest::MD5 qw(md5_base64);
 use constant MAGIC_NUMBER => 5;
-use Carp qw(cluck);
 use Time::HiRes qw(time);
 
 my $wsdlfile = File::Spec->catfile( 't', 'SWIContactServices.WSDL' );
@@ -43,7 +42,7 @@ my ( $answer, $trace ) = $call->(%request);
 
 if ( my $e = $@->wasFatal ) {
 
-    $e->throw;
+    BAIL_OUT($e);
 
 }
 
@@ -83,6 +82,21 @@ for my $i ( 1 .. 20 ) {
 
         }
     }
+
+}
+
+TODO: {
+
+    local $TODO = 'fault_response must be created' if 1;
+
+    my $call2 = $wsdl->compileClient(
+        operation      => 'SWIContactServicesQueryByExample',
+        transport_hook => \&fake_response
+    );
+
+    my ( $answer, $trace ) = $call2->(%request);
+
+    dies_ok { $auth->check_fault($answer) } 'instance can detect SOAP faults';
 
 }
 

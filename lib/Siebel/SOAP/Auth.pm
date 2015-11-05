@@ -477,6 +477,8 @@ It expects as parameter the hash reference returned by the execution of the code
 C<compileClient> method of L<XML::Compile::WSDL11>. This hash reference must have a key as defined by the
 C<token_key> attribute of a instance of Siebel::SOAP::Auth.
 
+The method also will invoke C<check_fault> automatically to validate the answer.
+
 Once the token is found, the object updates itself internally. Otherwise an exception will be raised.
 
 =cut
@@ -488,6 +490,7 @@ sub find_token {
     croak "Expect as parameter a hash reference"
       unless ( ( defined($answer) ) and ( ref($answer) eq 'HASH' ) );
 
+    $self->check_fault($answer);
     my $key = $self->get_token_key();
 
     if ( exists( $answer->{$key} ) ) {
