@@ -21,11 +21,11 @@ Siebel::SOAP::Auth - Moo based class to implement transparent Siebel Session Man
 =head1 SYNOPSIS
 
     use XML::Compile::WSDL11;
-	use XML::Compile::SOAP11;
+    use XML::Compile::SOAP11;
     use XML::Compile::Transport::SOAPHTTP;
-	use Siebel::SOAP::Auth;
+    use Siebel::SOAP::Auth;
 
-	my $wsdlfile = File::Spec->catfile( 't', 'SWIContactServices.WSDL' );
+    my $wsdlfile = File::Spec->catfile( 't', 'SWIContactServices.WSDL' );
     my %request = (
         ListOfSwicontactio => {
             Contact =>
@@ -63,13 +63,13 @@ Siebel::SOAP::Auth - Moo based class to implement transparent Siebel Session Man
 
         # do something with the answer
 
-	}
+    }
 
 =head1 DESCRIPTION
 
-Siebel::SOAP::Auth implements authentication for Oracle's Siebel inbound webservices by implementing Session Management.
+Siebel::SOAP::Auth provides authentication for Oracle's Siebel inbound web services by implementing Session Management.
 
-Session Management is implemented by using a instance of Siebel::SOAP::Auth inside a C<transport_hook> C<sub>, passing to it the original request. The original request will
+Implementation uses a instance of Siebel::SOAP::Auth inside a C<transport_hook> C<sub>, passing to it the original request. The original request will
 be modified, adding necessary authentication data to the SOAP Header. The instance of Siebel::SOAP::Auth will also try to manage the session and token expiration times and
 request a new one before expiration, avoiding a new round-trip to the server for another successful request.
 
@@ -78,7 +78,7 @@ of requesting tokens automatically (but some tuning with the parameters might be
 
 This class is tight coupled to L<XML::Compile::WSDL11> interface. By using it, it is expected that you will use everything else from L<XML::Compile>.
 
-This class is a L<Moo> class and it uses also L<Log::Report> to provide debug information if required.
+This class is L<Moo> based and it uses also L<Log::Report> to provide debug information if required.
 
 =head1 ATTRIBUTES
 
@@ -554,6 +554,18 @@ sub check_fault {
     }
 
 }
+
+=head1 DEBUGGING
+
+You can enable debug messages for your code in the same way it is possible for L<XML::Compile::WSDL11>: by using L<Log::Report>. For example, the line:
+
+    use Log::Report mode => 'DEBUG';
+
+Added to your code will print trace messages of Siebel::SOAP::Auth object.
+
+To disable just change the line to:
+
+    use Log::Report mode => 'NORMAL';
 
 =head1 SEE ALSO
 

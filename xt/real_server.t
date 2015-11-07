@@ -6,7 +6,7 @@ use XML::Compile::Transport::SOAPHTTP;
 use Log::Report mode => 'NORMAL';
 use Siebel::SOAP::Auth;
 use Config::Tiny 2.23;
-use Test::More tests => no_plan;
+use Test::More;
 
 my ( $call, $auth );
 my %request = (
@@ -21,7 +21,7 @@ my %request = (
 
 SKIP: {
 
-    skip 'No configuration available for testing with a real server',
+    skip 'No configuration available for testing with a real server', 1
       unless ( ( exists( $ENV{SIEBEL_SOAP_AUTH} ) )
         and ( defined( $ENV{SIEBEL_SOAP_AUTH} ) ) );
 
@@ -31,7 +31,7 @@ SKIP: {
     # forcing server side timeout
     my $forced_timeout = $config->{General}->{timeout} + 100;
 
-    my $auth = Siebel::SOAP::Auth->new(
+    $auth = Siebel::SOAP::Auth->new(
         {
             user            => $config->{General}->{user},
             password        => $config->{General}->{password},
@@ -68,14 +68,17 @@ SKIP: {
         'the Siebel Server returned a valid token' )
       or diag( explain($answer) );
     note( 'auth instance has token_timeout = ' . $auth->get_token_timeout );
-    my $fixed_sleep = 50;
+    my $fixed_sleep = 100;
     note(
 "Repeating the request, ignoring token renew and hoping that the Siebel Server do not return a SOAP Fault"
     );
-    my $time_left = $start + $config->{General}->{timeout};
+    my $time_left = $config->{General}->{timeout};
 
-    do {
+    while (1) {
 
+        my ( $t1, $t2 );
+
+        $t1 = time();
         sleep($fixed_sleep);
 
         try sub {
@@ -87,9 +90,12 @@ SKIP: {
 
         if ( my $e = $@->wasFatal ) {
 
-            note('Caught an exception before the expected:');
-            diag( explain($answer) );
-            BAIL_OUT($e);
+            my $e = $@->wasFatal;
+            ok( $e, 'the Siebel Server returned an exception' )
+              or diag( explain($answer) );
+            like( $e, qr/token\sexpired/,
+                'the expected SOAP fault was returned' );
+            last;
 
         }
         else {
@@ -109,17 +115,11 @@ SKIP: {
 
         }
 
-        $time_left -= time() - $start;
+        $t2 = time();
+        $time_left -= ( $t2 - $t1 );
         note("Time left: $time_left");
 
-    } while ( $time_left - $fixed_sleep );
-
-    sleep( $fixed_sleep + 1 );
-    note('Now expecting to have a SOAP fault');
-    ( $answer, $trace ) = $call->(%request);
-    my $e = $@->wasFatal;
-    ok( $e, 'the Siebel Server returned an exception' );
-    like( $e, qr/token\sexpired/, 'the expected SOAP fault was returned' );
+    }
 
 }
 
