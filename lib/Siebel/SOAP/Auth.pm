@@ -11,6 +11,7 @@ use Scalar::Util qw(blessed);
 use Time::HiRes qw(time);
 use Log::Report 1.05 'siebel-soap-auth', syntax => 'SHORT';
 use Carp;
+# VERSION
 
 =pod
 
@@ -389,15 +390,12 @@ It returns the L<HTTP::Request> with its payload modified.
 
 sub add_auth_header {
 
-    #my ($self, $request, $ua) = @_;
     my ( $self, $request ) = @_;
 
     croak "Expect as parameter a HTTP::Request instance"
       unless ( ( defined($request) )
         and ( defined( blessed($request) ) )
         and ( $request->isa('HTTP::Request') ) );
-
-#die "Expect as parameter a LWP::UserAgent object" unless ( (defined($ua)) and (defined(blessed($ua))) and ($ua->isa('LWP::UserAgent')) );
 
     my $payload = XML::LibXML->load_xml( string => $request->decoded_content );
     my $root    = $payload->getDocumentElement;
